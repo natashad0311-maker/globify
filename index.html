@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0A0A0F"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Globify"/>
+<meta name="description" content="Gestión inteligente para emprendedoras de globos"/>
+<title>Globify — Gestión para Emprendedoras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0A0A0F;
+  --surface: #111118;
+  --surface2: #18181F;
+  --border: #1E1E2A;
+  --accent: #6C5CE7;
+  --accent2: #A29BFE;
+  --glow: rgba(108,92,231,0.15);
+  --success: #00B894;
+  --warning: #FDCB6E;
+  --danger: #E17055;
+  --text: #EEEEF5;
+  --muted: #5A5A72;
+  --dim: #2A2A3A;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden}
+h1,h2,h3,.logo-text{font-family:'Syne',sans-serif}
+
+/* ── LOCK SCREEN ── */
+#lockScreen{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px;
+  animation:fadeIn .4s ease;
+}
+.lock-orb{
+  width:90px;height:90px;border-radius:50%;
+  background:conic-gradient(from 0deg, #6C5CE7, #A29BFE, #6C5CE7);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;margin-bottom:28px;
+  box-shadow:0 0 40px rgba(108,92,231,0.4);
+  animation:spin 8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lock-title{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;text-align:center}
+.lock-sub{font-size:13px;color:var(--muted);margin-bottom:36px;text-align:center}
+.lock-box{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px}
+.lock-box label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;display:block;margin-bottom:8px}
+.lock-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;letter-spacing:2px;outline:none;transition:border .2s}
+.lock-input:focus{border-color:var(--accent)}
+.lock-btn{width:100%;margin-top:14px;padding:13px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;letter-spacing:0.3px;transition:all .15s}
+.lock-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+.lock-error{color:var(--danger);font-size:12px;margin-top:10px;text-align:center;min-height:18px}
+.lock-footer{margin-top:24px;font-size:11px;color:var(--dim);text-align:center}
+
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;flex-direction:column}
+#app.visible{display:flex}
+
+/* ── TOP BAR (mobile) ── */
+.topbar{
+  display:none;background:var(--surface);border-bottom:1px solid var(--border);
+  padding:14px 20px;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.topbar-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;
+  background:linear-gradient(135deg,var(--accent2),#C084FC);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.menu-btn{background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px}
+
+/* ── LAYOUT ── */
+.shell{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:220px;background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;
+  transition:transform .25s ease;
+}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-text{font-size:22px;font-weight:800;letter-spacing:-0.5px;
+  background:linear-gradient(135deg,var(--accent2),#C084FC);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:0.8px;margin-top:3px}
+nav{padding:12px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;
+  border-left:2px solid transparent;transition:all .15s;font-size:13px;color:var(--muted)}
+.nav-item:hover{color:var(--text);background:var(--surface2)}
+.nav-item.active{color:var(--accent2);background:var(--glow);border-left-color:var(--accent);font-weight:600}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.sidebar-foot{padding:16px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.sidebar-foot span{display:block;font-weight:600;color:var(--text);font-size:13px}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:28px 28px 60px;background:var(--bg)}
+
+/* ── OVERLAY (mobile) ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50}
+.overlay.show{display:block}
+
+/* ── PAGE ── */
+.page{display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:3px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+
+/* ── GRID ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.card-title{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px}
+.stat-val{font-size:26px;font-weight:800;letter-spacing:-1px}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent)}
+.btn-danger{background:rgba(225,112,85,0.12);color:var(--danger);border:1px solid transparent}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-full{width:100%}
+
+/* ── FORM ── */
+.field{margin-bottom:14px}
+.field label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.4px;display:block;margin-bottom:6px}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;
+  font-family:'DM Sans',sans-serif;outline:none;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:60px}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.4px;border-bottom:1px solid var(--border)}
+.tbl td{padding:11px 12px;font-size:13px;border-bottom:1px solid rgba(30,30,42,.6);vertical-align:middle}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-accent{background:rgba(108,92,231,.15);color:var(--accent2)}
+.badge-success{background:rgba(0,184,148,.15);color:var(--success)}
+.badge-warning{background:rgba(253,203,110,.15);color:var(--warning)}
+.badge-danger{background:rgba(225,112,85,.15);color:var(--danger)}
+.badge-muted{background:var(--dim);color:var(--muted)}
+
+/* ── ALERT ── */
+.alert{padding:10px 14px;border-radius:8px;font-size:12px;font-weight:500;margin-bottom:8px}
+.alert-warning{background:rgba(253,203,110,.1);border:1px solid rgba(253,203,110,.3);color:var(--warning)}
+.alert-danger{background:rgba(225,112,85,.1);border:1px solid rgba(225,112,85,.3);color:var(--danger)}
+.alert-success{background:rgba(0,184,148,.1);border:1px solid rgba(0,184,148,.3);color:var(--success)}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+/* ── HIGHLIGHT BOX ── */
+.hbox{background:var(--glow);border:1px solid rgba(108,92,231,.2);border-radius:12px;padding:14px;margin:12px 0}
+
+/* ── CHART BAR ── */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:8px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;background:var(--accent);border-radius:4px 4px 0 0;min-height:4px;transition:height .3s}
+.bar-lbl{font-size:10px;color:var(--muted)}
+
+/* ── AVATAR ── */
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--accent2);flex-shrink:0}
+
+/* ── INSTALL BANNER ── */
+#installBanner{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--surface);border:1px solid var(--accent);border-radius:14px;
+  padding:14px 20px;z-index:300;box-shadow:0 8px 32px rgba(0,0,0,.4);
+  display:none;align-items:center;gap:14px;max-width:340px;width:calc(100% - 32px)}
+#installBanner.show{display:flex}
+.install-text{font-size:13px;flex:1}
+.install-text strong{display:block;font-weight:700;margin-bottom:2px}
+.install-text span{font-size:11px;color:var(--muted)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .topbar{display:flex}
+  .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:60;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{padding:20px 16px 80px}
+  .grid-4{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:1fr 1fr}
+  .grid-2{grid-template-columns:1fr}
+  .page-title{font-size:20px}
+  .tbl th:nth-child(n+4),.tbl td:nth-child(n+4){display:none}
+  .modal{padding:18px}
+}
+@media(max-width:480px){
+  .grid-3,.grid-4{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     LOCK SCREEN
+══════════════════════════════════════════════════ -->
+<div id="lockScreen">
+  <div class="lock-orb">✦</div>
+  <div class="lock-title">Globify</div>
+  <div class="lock-sub">Gestión inteligente para emprendedoras de globos</div>
+  <div class="lock-box">
+    <label>Clave de acceso</label>
+    <input class="lock-input" id="keyInput" type="password" placeholder="••••••••" maxlength="20" autocomplete="off"/>
+    <button class="lock-btn" onclick="checkKey()">Ingresar →</button>
+    <div class="lock-error" id="keyError"></div>
+  </div>
+  <div class="lock-footer">¿No tienes tu clave? Contacta a quien te vendió el acceso.</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     APP
+══════════════════════════════════════════════════ -->
+<div id="app">
+  <!-- Top bar mobile -->
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-logo">✦ Globify</div>
+    <div style="width:30px"></div>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <div class="shell">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-text">✦ Globify</div>
+        <div class="logo-sub">GESTIÓN PARA EMPRENDEDORAS</div>
+      </div>
+      <nav id="nav">
+        <div class="nav-item active" data-page="dashboard"><span class="nav-icon">◈</span>Dashboard</div>
+        <div class="nav-item" data-page="materials"><span class="nav-icon">⬡</span>Materiales</div>
+        <div class="nav-item" data-page="products"><span class="nav-icon">✦</span>Productos</div>
+        <div class="nav-item" data-page="budgets"><span class="nav-icon">◻</span>Presupuestos</div>
+        <div class="nav-item" data-page="sales"><span class="nav-icon">◆</span>Ventas</div>
+        <div class="nav-item" data-page="clients"><span class="nav-icon">◉</span>Clientes</div>
+        <div class="nav-item" data-page="helium"><span class="nav-icon">○</span>Calculadora Helio</div>
+        <div class="nav-item" data-page="tools"><span class="nav-icon">⚙</span>Herramientas</div>
+        <div class="nav-item" data-page="settings"><span class="nav-icon">◈</span>Mi Negocio</div>
+      </nav>
+      <div class="sidebar-foot">
+        <span id="sideBusinessName">Mi Negocio</span>
+        <div id="sideInsta" style="font-size:11px;margin-top:2px"></div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub" id="dash-sub">Resumen de tu negocio</div>
+        <div class="grid-4" id="dash-stats" style="margin-bottom:14px"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Ventas por mes</div>
+            <div class="bar-chart" id="dash-chart"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Resumen financiero</div>
+            <div id="dash-finance"></div>
+          </div>
+        </div>
+        <div class="grid-3" style="margin-top:14px" id="dash-bottom"></div>
+      </div>
+
+      <!-- MATERIALS -->
+      <div class="page" id="page-materials">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="page-title">Materiales</div>
+            <div class="page-sub" id="mat-count"></div>
+          </div>
+          <button class="btn btn-primary" onclick="openMatModal()">+ Nuevo Material</button>
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <input type="text" id="matSearch" placeholder="Buscar material..." oninput="renderMaterials()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none"/>
+        </div>
+        <div class="card" style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr>
+              <th>Material</th><th>Categoría</th><th>Precio Paq.</th><th>Cant.</th><th>Costo c/desp.</th><th></th>
+            </tr></thead>
+            <tbody id="mat-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div class="page" id="page-products">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="page-title">Productos</div>
+            <div class="page-sub">Crea y calcula el precio real de cada producto</div>
+          </div>
+          <button class="btn btn-primary" onclick="openProductModal()">+ Nuevo Producto</button>
+        </div>
+        <div class="grid-3" id="products-grid"></div>
+      </div>
+
+      <!-- BUDGETS -->
+      <div class="page" id="page-budgets">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="page-title">Presupuestos</div>
+            <div class="page-sub" id="budget-count"></div>
+          </div>
+          <button class="btn btn-primary" onclick="openBudgetModal()">+ Nuevo Presupuesto</button>
+        </div>
+        <div class="card" style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="budget-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SALES -->
+      <div class="page" id="page-sales">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="page-title">Ventas</div>
+            <div class="page-sub" id="sales-count"></div>
+          </div>
+          <button class="btn btn-primary" onclick="openSaleModal()">+ Registrar Venta</button>
+        </div>
+        <div class="grid-3" id="sales-stats" style="margin-bottom:14px"></div>
+        <div class="card" style="overflow-x:auto">
+          <div class="field" style="margin-bottom:12px">
+            <input type="text" id="salesSearch" placeholder="Buscar cliente..." oninput="renderSales()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none"/>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>Cliente</th><th>Total</th><th>Ganancia</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="sales-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div class="page" id="page-clients">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="page-title">Clientes</div>
+            <div class="page-sub" id="clients-count"></div>
+          </div>
+          <button class="btn btn-primary" onclick="openClientModal()">+ Nuevo Cliente</button>
+        </div>
+        <div class="grid-3" id="clients-grid"></div>
+      </div>
+
+      <!-- HELIUM -->
+      <div class="page" id="page-helium">
+        <div class="page-title">Calculadora de Helio</div>
+        <div class="page-sub">Calcula el costo real del helio por globo</div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="field"><label>Costo del tanque ($)</label><input type="number" id="h-tank" value="45000" oninput="calcHelium()"/></div>
+            <div class="field"><label>Globos que infla el tanque</label><input type="number" id="h-count" value="80" oninput="calcHelium()"/></div>
+            <div class="field"><label>Tipo de globo</label>
+              <select id="h-type" onchange="calcHelium()">
+                <option>R5</option><option>R9</option><option selected>R12</option>
+                <option>R18</option><option>Foil 18"</option><option>Foil 32"</option>
+              </select>
+            </div>
+            <div class="field"><label>¿Cuántos globos necesitas inflar?</label><input type="number" id="h-need" value="20" oninput="calcHelium()"/></div>
+          </div>
+          <div>
+            <div class="hbox" id="helium-result"></div>
+            <div class="card" style="margin-top:14px">
+              <div class="card-title">💡 Consejo de precio</div>
+              <div id="helium-tip" style="font-size:13px;color:var(--muted)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLS (depreciación) -->
+      <div class="page" id="page-tools">
+        <div class="page-title">Depreciación de Herramientas</div>
+        <div class="page-sub">Calcula cuánto te cuesta cada herramienta por trabajo</div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Agregar herramienta</div>
+            <div class="field"><label>Nombre del equipo</label><input type="text" id="t-name" placeholder="Ej: Inflador eléctrico"/></div>
+            <div class="field"><label>Valor del equipo ($)</label><input type="number" id="t-val" placeholder="0"/></div>
+            <div class="field"><label>Vida útil (años)</label><input type="number" id="t-life" value="3"/></div>
+            <div class="field"><label>Trabajos por mes</label><input type="number" id="t-month" value="10"/></div>
+            <button class="btn btn-primary btn-full" onclick="addTool()">+ Agregar</button>
+          </div>
+          <div>
+            <div id="tools-list"></div>
+            <div class="card" style="margin-top:14px" id="tools-total-card" style="display:none">
+              <div class="card-title">Costo total de herramientas por trabajo</div>
+              <div id="tools-total" style="font-size:26px;font-weight:800;color:var(--warning)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="page-title">Mi Negocio</div>
+        <div class="page-sub">Personaliza la información de tu emprendimiento</div>
+        <div style="max-width:520px">
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title">Información del negocio</div>
+            <div class="field"><label>Nombre del negocio</label><input type="text" id="s-name" placeholder="Mi Negocio de Globos"/></div>
+            <div class="field"><label>Instagram (sin @)</label><input type="text" id="s-ig" placeholder="minegocio"/></div>
+            <div class="field"><label>WhatsApp (con código de país)</label><input type="text" id="s-wa" placeholder="+56912345678"/></div>
+            <div class="field"><label>Correo electrónico</label><input type="email" id="s-email" placeholder="hola@minegocio.com"/></div>
+            <div class="field"><label>Ciudad / Dirección</label><input type="text" id="s-addr" placeholder="Santiago, Chile"/></div>
+          </div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title">🌍 Moneda del negocio</div>
+            <div class="field">
+              <label>Selecciona tu moneda</label>
+              <select id="s-currency" onchange="previewCurrency()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s">
+                <option value="CLP">🇨🇱 Peso Chileno (CLP)</option>
+                <option value="COP">🇨🇴 Peso Colombiano (COP)</option>
+                <option value="MXN">🇲🇽 Peso Mexicano (MXN)</option>
+                <option value="ARS">🇦🇷 Peso Argentino (ARS)</option>
+                <option value="USD">🇺🇸 Dólar (USD)</option>
+                <option value="EUR">🇪🇺 Euro (EUR)</option>
+                <option value="VES">🇻🇪 Bolívar Soberano (VES)</option>
+                <option value="PEN">🇵🇪 Sol Peruano (PEN)</option>
+                <option value="BRL">🇧🇷 Real Brasileño (BRL)</option>
+                <option value="GTQ">🇬🇹 Quetzal (GTQ)</option>
+              </select>
+            </div>
+            <div id="s-currency-preview" style="font-size:13px;color:var(--muted);padding:10px 12px;background:var(--surface2);border-radius:8px;display:none"></div>
+          </div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title">Configuración de costos</div>
+            <div class="field"><label>Valor de tu hora de trabajo</label><input type="number" id="s-hour" value="15000"/></div>
+            <div class="field"><label>Gasto mensual en publicidad</label><input type="number" id="s-ads" value="0"/></div>
+            <div class="field"><label>Pedidos promedio por mes</label><input type="number" id="s-orders" value="10"/></div>
+            <div id="s-ads-result"></div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="saveSettings()">Guardar configuración</button>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /shell -->
+</div><!-- /app -->
+
+<!-- INSTALL BANNER -->
+<div id="installBanner">
+  <div style="font-size:24px">📲</div>
+  <div class="install-text">
+    <strong>Instalar Globify</strong>
+    <span>Agrégala a tu pantalla de inicio</span>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="installApp()">Instalar</button>
+  <button onclick="document.getElementById('installBanner').classList.remove('show')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px">×</button>
+</div>
+
+<!-- ════════════════════
+     MODALS
+════════════════════ -->
+
+<!-- Material Modal -->
+<div class="modal-bg" id="matModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="matModalTitle">Nuevo Material</h3>
+      <button class="modal-close" onclick="closeModal('matModal')">×</button>
+    </div>
+    <div class="grid-2">
+      <div class="field" style="grid-column:1/-1"><label>Nombre del material</label><input type="text" id="m-name" placeholder="Ej: Globo R12"/></div>
+      <div class="field"><label>Categoría</label>
+        <select id="m-cat">
+          <option>Látex</option><option>Foil</option><option>Gas</option>
+          <option>Accesorio</option><option>Decoración</option><option>Regalo</option><option>Servicio</option>
+        </select>
+      </div>
+      <div class="field"><label>Precio del paquete ($)</label><input type="number" id="m-price" placeholder="0" oninput="updateMatPreview()"/></div>
+      <div class="field"><label>Cantidad en paquete (u.)</label><input type="number" id="m-qty" placeholder="1" oninput="updateMatPreview()"/></div>
+      <div class="field"><label>% Desperdicio</label><input type="number" id="m-waste" value="5" min="0" oninput="updateMatPreview()"/></div>
+      <div class="field"><label>% Pérdida</label><input type="number" id="m-loss" value="2" min="0" oninput="updateMatPreview()"/></div>
+      <div class="field"><label>Proveedor (opcional)</label><input type="text" id="m-prov" placeholder=""/></div>
+      <div class="field"><label>Observaciones</label><input type="text" id="m-notes" placeholder=""/></div>
+    </div>
+    <div class="hbox" id="matPreview" style="display:none">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Costo unitario real (con desperdicio y pérdida)</div>
+      <div id="matPreviewVal" style="font-size:22px;font-weight:800;color:var(--accent2)"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('matModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMaterial()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal-bg" id="productModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="prodModalTitle">Nuevo Producto</h3>
+      <button class="modal-close" onclick="closeModal('productModal')">×</button>
+    </div>
+    <div class="field"><label>Nombre del producto</label><input type="text" id="p-name" placeholder="Ej: Bouquet romántico"/></div>
+    <div class="field"><label>Tipo</label>
+      <select id="p-type">
+        <option>Bouquet de Globos</option><option>Arco Orgánico</option><option>Decoración Completa</option>
+        <option>Caja Sorpresa</option><option>Desayuno Sorpresa</option><option>Centro de Mesa</option><option>Regalo Personalizado</option>
+      </select>
+    </div>
+    <div class="card-title" style="margin-top:4px">Materiales</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <select id="p-mat-sel" style="flex:2;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;min-width:140px"></select>
+      <input type="number" id="p-mat-qty" value="1" min="1" style="flex:1;min-width:60px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none"/>
+      <button class="btn btn-ghost" onclick="addProductItem()">+</button>
+    </div>
+    <div id="p-items-list" style="margin-bottom:10px"></div>
+    <div class="card-title">Mano de obra</div>
+    <div class="grid-3" style="gap:8px">
+      <div class="field"><label>Valor hora ($)</label><input type="number" id="p-hour" value="15000" oninput="updateProdPreview()"/></div>
+      <div class="field"><label>Horas trabajo</label><input type="number" id="p-time" value="1" min="0.5" step="0.5" oninput="updateProdPreview()"/></div>
+      <div class="field"><label>Complejidad (x)</label><input type="number" id="p-comp" value="1" min="1" step="0.5" oninput="updateProdPreview()"/></div>
+    </div>
+    <div class="field"><label>Margen de ganancia (%)</label><input type="number" id="p-margin" value="40" oninput="updateProdPreview()"/></div>
+    <div class="hbox" id="prodPreview"></div>
+    <div id="prod-alerts"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('productModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProduct()">Guardar Producto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Budget Modal -->
+<div class="modal-bg" id="budgetModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Nuevo Presupuesto</h3>
+      <button class="modal-close" onclick="closeModal('budgetModal')">×</button>
+    </div>
+    <div class="field"><label>Nombre del cliente</label><input type="text" id="b-client" placeholder="Nombre completo"/></div>
+    <div class="field"><label>Fecha</label><input type="date" id="b-date"/></div>
+    <div class="card-title">Productos</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <select id="b-prod-sel" style="flex:2;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;min-width:140px"></select>
+      <input type="number" id="b-prod-qty" value="1" min="1" style="flex:1;min-width:60px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none"/>
+      <button class="btn btn-ghost" onclick="addBudgetItem()">+</button>
+    </div>
+    <div id="b-items-list" style="margin-bottom:10px"></div>
+    <div class="hbox" id="b-total-box" style="display:none">
+      <div style="font-size:11px;color:var(--muted)">Total del presupuesto</div>
+      <div id="b-total-val" style="font-size:24px;font-weight:800;color:var(--success)"></div>
+    </div>
+    <div class="field"><label>Días de entrega estimados</label><input type="number" id="b-delivery" value="3"/></div>
+    <div class="field"><label>Observaciones</label><input type="text" id="b-notes" placeholder=""/></div>
+    <div class="field"><label>Condiciones de servicio</label><input type="text" id="b-cond" value="50% anticipo, saldo al entregar."/></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('budgetModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveBudget()">Guardar Presupuesto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sale Modal -->
+<div class="modal-bg" id="saleModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Registrar Venta</h3>
+      <button class="modal-close" onclick="closeModal('saleModal')">×</button>
+    </div>
+    <div class="field"><label>Cliente</label><input type="text" id="sl-client" placeholder="Nombre del cliente"/></div>
+    <div class="field"><label>Fecha</label><input type="date" id="sl-date"/></div>
+    <div class="grid-2" style="gap:10px">
+      <div class="field"><label>Total vendido ($)</label><input type="number" id="sl-total" placeholder="0" oninput="updateSaleProfit()"/></div>
+      <div class="field"><label>Ganancia neta ($)</label><input type="number" id="sl-profit" placeholder="0"/></div>
+    </div>
+    <div class="field"><label>Método de pago</label>
+      <select id="sl-method">
+        <option>efectivo</option><option>transferencia</option><option>tarjeta</option><option>otro</option>
+      </select>
+    </div>
+    <div class="field"><label>Estado</label>
+      <select id="sl-status">
+        <option value="pagado">pagado</option><option value="pendiente">pendiente</option><option value="cancelado">cancelado</option>
+      </select>
+    </div>
+    <div class="field"><label>Notas</label><input type="text" id="sl-notes" placeholder=""/></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('saleModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSale()">Guardar Venta</button>
+    </div>
+  </div>
+</div>
+
+<!-- Client Modal -->
+<div class="modal-bg" id="clientModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="clientModalTitle">Nuevo Cliente</h3>
+      <button class="modal-close" onclick="closeModal('clientModal')">×</button>
+    </div>
+    <div class="field"><label>Nombre completo</label><input type="text" id="cl-name" placeholder=""/></div>
+    <div class="field"><label>Teléfono / WhatsApp</label><input type="text" id="cl-phone" placeholder="+56912345678"/></div>
+    <div class="field"><label>Instagram (sin @)</label><input type="text" id="cl-ig" placeholder="usuario"/></div>
+    <div class="field"><label>Fecha de cumpleaños</label><input type="date" id="cl-bday"/></div>
+    <div class="field"><label>Notas</label><textarea id="cl-notes" placeholder=""></textarea></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('clientModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveClient()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIGURATION — EDIT YOUR VALID KEYS HERE
+// ══════════════════════════════════════════════
+const VALID_KEYS = [
+  "GLOBIFY-2024-A1",
+  "GLOBIFY-2024-B2",
+  "GLOBIFY-2024-C3",
+  "GLOBIFY-2024-D4",
+  "GLOBIFY-2024-E5",
+  // Agrega más claves aquí para cada cliente
+];
+
+// ══════════════════════════════════════════════
+//  LOCK SYSTEM
+// ══════════════════════════════════════════════
+function checkKey() {
+  const val = document.getElementById('keyInput').value.trim().toUpperCase();
+  const err = document.getElementById('keyError');
+  if (VALID_KEYS.includes(val)) {
+    localStorage.setItem('globify_key', val);
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    initApp();
+  } else {
+    err.textContent = 'Clave incorrecta. Verifica e intenta de nuevo.';
+    document.getElementById('keyInput').style.borderColor = 'var(--danger)';
+    setTimeout(() => {
+      err.textContent = '';
+      document.getElementById('keyInput').style.borderColor = '';
+    }, 3000);
+  }
+}
+document.getElementById('keyInput').addEventListener('keydown', e => { if(e.key==='Enter') checkKey(); });
+
+// Auto-login si ya tiene clave guardada
+(function(){
+  const saved = localStorage.getItem('globify_key');
+  if (saved && VALID_KEYS.includes(saved)) {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    initApp();
+  }
+})();
+
+// ══════════════════════════════════════════════
+//  DATA — localStorage persistence
+// ══════════════════════════════════════════════
+const DEFAULT_MATERIALS = [
+  {id:'m1',name:'Globo R5',category:'Látex',packagePrice:2500,packageQty:100,waste:5,loss:2,provider:'',notes:''},
+  {id:'m2',name:'Globo R9',category:'Látex',packagePrice:3000,packageQty:50,waste:5,loss:2,provider:'',notes:''},
+  {id:'m3',name:'Globo R12',category:'Látex',packagePrice:4000,packageQty:50,waste:8,loss:3,provider:'',notes:''},
+  {id:'m4',name:'Globo R18',category:'Látex',packagePrice:5500,packageQty:25,waste:8,loss:3,provider:'',notes:''},
+  {id:'m5',name:'Globo Chrome',category:'Látex',packagePrice:6000,packageQty:50,waste:10,loss:5,provider:'',notes:''},
+  {id:'m6',name:'Globo Pastel',category:'Látex',packagePrice:4500,packageQty:50,waste:5,loss:2,provider:'',notes:''},
+  {id:'m7',name:'Globo Doble Stuffing',category:'Látex',packagePrice:7000,packageQty:25,waste:10,loss:5,provider:'',notes:''},
+  {id:'m8',name:'Foil 18"',category:'Foil',packagePrice:1500,packageQty:1,waste:0,loss:1,provider:'',notes:''},
+  {id:'m9',name:'Foil 32"',category:'Foil',packagePrice:2500,packageQty:1,waste:0,loss:1,provider:'',notes:''},
+  {id:'m10',name:'Foil 40"',category:'Foil',packagePrice:3500,packageQty:1,waste:0,loss:1,provider:'',notes:''},
+  {id:'m11',name:'Número Foil',category:'Foil',packagePrice:2000,packageQty:1,waste:0,loss:1,provider:'',notes:''},
+  {id:'m12',name:'Letra Foil',category:'Foil',packagePrice:2000,packageQty:1,waste:0,loss:1,provider:'',notes:''},
+  {id:'m13',name:'Burbuja Transparente',category:'Foil',packagePrice:4000,packageQty:1,waste:0,loss:2,provider:'',notes:''},
+  {id:'m14',name:'Helio (por globo R12)',category:'Gas',packagePrice:562,packageQty:1,waste:5,loss:0,provider:'',notes:''},
+  {id:'m15',name:'Cinta',category:'Accesorio',packagePrice:800,packageQty:1,waste:10,loss:5,provider:'',notes:''},
+  {id:'m16',name:'Pegamento Silicona',category:'Accesorio',packagePrice:1500,packageQty:1,waste:15,loss:5,provider:'',notes:''},
+  {id:'m17',name:'Varillas',category:'Accesorio',packagePrice:2000,packageQty:20,waste:5,loss:2,provider:'',notes:''},
+  {id:'m18',name:'Papel Coreano',category:'Decoración',packagePrice:3500,packageQty:10,waste:20,loss:5,provider:'',notes:''},
+  {id:'m19',name:'Flores',category:'Decoración',packagePrice:5000,packageQty:1,waste:20,loss:10,provider:'',notes:''},
+  {id:'m20',name:'Caja Sorpresa',category:'Regalo',packagePrice:4000,packageQty:1,waste:0,loss:2,provider:'',notes:''},
+  {id:'m21',name:'Dulces',category:'Regalo',packagePrice:3000,packageQty:1,waste:5,loss:2,provider:'',notes:''},
+  {id:'m22',name:'Peluche',category:'Regalo',packagePrice:8000,packageQty:1,waste:0,loss:1,provider:'',notes:''},
+  {id:'m23',name:'Tarjeta',category:'Regalo',packagePrice:500,packageQty:1,waste:0,loss:1,provider:'',notes:''},
+  {id:'m24',name:'Luces LED',category:'Decoración',packagePrice:3500,packageQty:1,waste:0,loss:2,provider:'',notes:''},
+  {id:'m25',name:'Moños',category:'Accesorio',packagePrice:1200,packageQty:10,waste:5,loss:2,provider:'',notes:''},
+  {id:'m26',name:'Delivery / Transporte',category:'Servicio',packagePrice:5000,packageQty:1,waste:0,loss:0,provider:'',notes:''},
+];
+
+function load(key, def) {
+  try { const d = localStorage.getItem('globify_'+key); return d ? JSON.parse(d) : def; } catch(e){ return def; }
+}
+function save(key, val) {
+  try { localStorage.setItem('globify_'+key, JSON.stringify(val)); } catch(e){}
+}
+
+let DB = {
+  materials: load('materials', DEFAULT_MATERIALS),
+  products:  load('products',  []),
+  budgets:   load('budgets',   []),
+  sales:     load('sales',     []),
+  clients:   load('clients',   []),
+  tools:     load('tools',     []),
+  settings:  load('settings',  {name:'Mi Negocio',ig:'',wa:'',email:'',addr:'',hour:15000,ads:0,orders:10}),
+};
+
+function persist(key) { save(key, DB[key]); }
+
+// ══════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════
+const uid = () => Math.random().toString(36).slice(2,9);
+
+// ── CURRENCIES ──
+const CURRENCIES = [
+  { code:'CLP', label:'Peso Chileno',     symbol:'$',   locale:'es-CL', decimals:0 },
+  { code:'COP', label:'Peso Colombiano',  symbol:'$',   locale:'es-CO', decimals:0 },
+  { code:'MXN', label:'Peso Mexicano',    symbol:'$',   locale:'es-MX', decimals:2 },
+  { code:'ARS', label:'Peso Argentino',   symbol:'$',   locale:'es-AR', decimals:0 },
+  { code:'USD', label:'Dólar (USD)',       symbol:'$',   locale:'en-US', decimals:2 },
+  { code:'EUR', label:'Euro',             symbol:'€',   locale:'es-ES', decimals:2 },
+  { code:'VES', label:'Bolívar (VES)',     symbol:'Bs.', locale:'es-VE', decimals:2 },
+  { code:'PEN', label:'Sol Peruano',      symbol:'S/',  locale:'es-PE', decimals:2 },
+  { code:'BRL', label:'Real Brasileño',   symbol:'R$',  locale:'pt-BR', decimals:2 },
+  { code:'GTQ', label:'Quetzal (Guatemala)', symbol:'Q', locale:'es-GT', decimals:2 },
+];
+
+function getCurrency() {
+  const code = DB.settings.currency || 'CLP';
+  return CURRENCIES.find(c => c.code === code) || CURRENCIES[0];
+}
+
+const fmt = n => {
+  const cur = getCurrency();
+  const val = Math.round((n||0) * (cur.decimals > 0 ? 100 : 1)) / (cur.decimals > 0 ? 100 : 1);
+  try {
+    return new Intl.NumberFormat(cur.locale, {
+      style: 'currency', currency: cur.code,
+      minimumFractionDigits: cur.decimals,
+      maximumFractionDigits: cur.decimals
+    }).format(n||0);
+  } catch(e) {
+    return cur.symbol + ' ' + Math.round(n||0).toLocaleString();
+  }
+};
+
+const uc = m => (m.packagePrice/m.packageQty)*(1+(m.waste+m.loss)/100);
+const today = () => new Date().toISOString().slice(0,10);
+
+// ══════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════
+let currentPage = 'dashboard';
+document.getElementById('nav').addEventListener('click', e => {
+  const item = e.target.closest('.nav-item');
+  if (!item) return;
+  navigateTo(item.dataset.page);
+  closeSidebar();
+});
+
+function navigateTo(page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page===page));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id==='page-'+page));
+  currentPage = page;
+  renderPage(page);
+}
+
+function renderPage(page) {
+  switch(page) {
+    case 'dashboard':  renderDashboard(); break;
+    case 'materials':  renderMaterials(); break;
+    case 'products':   renderProducts(); break;
+    case 'budgets':    renderBudgets(); break;
+    case 'sales':      renderSales(); break;
+    case 'clients':    renderClients(); break;
+    case 'helium':     calcHelium(); break;
+    case 'tools':      renderTools(); break;
+    case 'settings':   loadSettings(); break;
+  }
+}
+
+// ══════════════════════════════════════════════
+//  SIDEBAR MOBILE
+// ══════════════════════════════════════════════
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+
+// ══════════════════════════════════════════════
+//  MODAL HELPERS
+// ══════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+// ══════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════
+function renderDashboard() {
+  const paidSales = DB.sales.filter(s=>s.status==='pagado');
+  const income = paidSales.reduce((a,s)=>a+s.total,0);
+  const profit = paidSales.reduce((a,s)=>a+(s.profit||0),0);
+  const margin = income ? (profit/income*100).toFixed(1) : 0;
+  const conv = DB.budgets.length ? ((DB.sales.length/DB.budgets.length)*100).toFixed(0) : 0;
+
+  document.getElementById('dash-sub').textContent = `Hola, ${DB.settings.name} 👋`;
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="card"><div class="card-title">Ingresos Totales</div><div class="stat-val" style="color:var(--success)">${fmt(income)}</div><div class="stat-sub">ventas pagadas</div></div>
+    <div class="card"><div class="card-title">Ganancia Neta</div><div class="stat-val" style="color:var(--accent2)">${fmt(profit)}</div><div class="stat-sub">margen ${margin}%</div></div>
+    <div class="card"><div class="card-title">Ventas</div><div class="stat-val">${DB.sales.length}</div><div class="stat-sub">${DB.budgets.length} presupuestos</div></div>
+    <div class="card"><div class="card-title">Conversión</div><div class="stat-val" style="color:${conv>50?'var(--success)':'var(--warning)'}">${conv}%</div><div class="stat-sub">presup. → ventas</div></div>
+  `;
+
+  // Bar chart
+  const months = {};
+  DB.sales.forEach(s=>{ const m=new Date(s.date+'T00:00:00').toLocaleString('es',{month:'short'}); months[m]=(months[m]||0)+s.total; });
+  const entries = Object.entries(months).slice(-6);
+  const maxV = Math.max(...entries.map(e=>e[1]),1);
+  const chart = document.getElementById('dash-chart');
+  chart.innerHTML = entries.length ? entries.map(([m,v])=>`
+    <div class="bar-col">
+      <div class="bar" style="height:${(v/maxV)*70}px"></div>
+      <div class="bar-lbl">${m}</div>
+    </div>`).join('') : '<div style="color:var(--muted);font-size:13px;padding:10px">Sin ventas aún</div>';
+
+  // Finance
+  document.getElementById('dash-finance').innerHTML = `
+    ${[['Ingresos Brutos',income,'var(--success)'],['Costos y Gastos',income-profit,'var(--danger)'],['Ganancia Neta',profit,'var(--accent2)']].map(([l,v,c])=>`
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px;color:var(--muted)">${l}</span>
+      <span style="font-size:13px;font-weight:700;color:${c}">${fmt(v)}</span>
+    </div>`).join('')}
+    ${Number(margin)<20&&income>0?'<div class="alert alert-warning" style="margin-top:10px">⚠ Tu margen de ganancia es bajo. Revisa tus precios.</div>':''}
+  `;
+
+  document.getElementById('dash-bottom').innerHTML = `
+    <div class="card"><div class="card-title">Clientes</div><div class="stat-val">${DB.clients.length}</div><div class="stat-sub">registrados</div></div>
+    <div class="card"><div class="card-title">Productos</div><div class="stat-val">${DB.products.length}</div><div class="stat-sub">creados</div></div>
+    <div class="card"><div class="card-title">Materiales</div><div class="stat-val">${DB.materials.length}</div><div class="stat-sub">en inventario</div></div>
+  `;
+}
+
+// ══════════════════════════════════════════════
+//  MATERIALS
+// ══════════════════════════════════════════════
+let editingMat = null;
+function renderMaterials() {
+  document.getElementById('mat-count').textContent = `${DB.materials.length} materiales registrados`;
+  const q = (document.getElementById('matSearch')||{}).value||'';
+  const filtered = DB.materials.filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('mat-tbody').innerHTML = filtered.map(m=>`
+    <tr>
+      <td><strong>${m.name}</strong></td>
+      <td><span class="badge badge-accent">${m.category}</span></td>
+      <td>${fmt(m.packagePrice)}</td>
+      <td>${m.packageQty} u.</td>
+      <td><strong style="color:var(--accent2)">${fmt(uc(m))}</strong></td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost btn-sm" onclick="openEditMat('${m.id}')">Editar</button>
+          <button class="btn btn-ghost btn-sm" onclick="dupMat('${m.id}')">Dup.</button>
+          <button class="btn btn-danger btn-sm" onclick="delMat('${m.id}')">×</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function openMatModal(){ editingMat=null; document.getElementById('matModalTitle').textContent='Nuevo Material'; ['m-name','m-prov','m-notes'].forEach(id=>document.getElementById(id).value=''); document.getElementById('m-cat').value='Látex'; document.getElementById('m-price').value=''; document.getElementById('m-qty').value=''; document.getElementById('m-waste').value=5; document.getElementById('m-loss').value=2; document.getElementById('matPreview').style.display='none'; openModal('matModal'); }
+function openEditMat(id){ const m=DB.materials.find(x=>x.id===id); if(!m)return; editingMat=id; document.getElementById('matModalTitle').textContent='Editar Material'; document.getElementById('m-name').value=m.name; document.getElementById('m-cat').value=m.category; document.getElementById('m-price').value=m.packagePrice; document.getElementById('m-qty').value=m.packageQty; document.getElementById('m-waste').value=m.waste; document.getElementById('m-loss').value=m.loss; document.getElementById('m-prov').value=m.provider||''; document.getElementById('m-notes').value=m.notes||''; updateMatPreview(); openModal('matModal'); }
+function updateMatPreview(){ const p=+document.getElementById('m-price').value,q=+document.getElementById('m-qty').value,w=+document.getElementById('m-waste').value,l=+document.getElementById('m-loss').value; if(p&&q){ const v=(p/q)*(1+(w+l)/100); document.getElementById('matPreview').style.display='block'; document.getElementById('matPreviewVal').textContent=fmt(v); } }
+function saveMaterial(){ const n=document.getElementById('m-name').value.trim(); if(!n)return; const m={id:editingMat||uid(),name:n,category:document.getElementById('m-cat').value,packagePrice:+document.getElementById('m-price').value||0,packageQty:+document.getElementById('m-qty').value||1,waste:+document.getElementById('m-waste').value||0,loss:+document.getElementById('m-loss').value||0,provider:document.getElementById('m-prov').value,notes:document.getElementById('m-notes').value}; if(editingMat) DB.materials=DB.materials.map(x=>x.id===editingMat?m:x); else DB.materials.push(m); persist('materials'); closeModal('matModal'); renderMaterials(); }
+function delMat(id){ if(confirm('¿Eliminar este material?')){ DB.materials=DB.materials.filter(m=>m.id!==id); persist('materials'); renderMaterials(); } }
+function dupMat(id){ const m=DB.materials.find(x=>x.id===id); if(!m)return; DB.materials.push({...m,id:uid(),name:m.name+' (copia)'}); persist('materials'); renderMaterials(); }
+
+// ══════════════════════════════════════════════
+//  PRODUCTS
+// ══════════════════════════════════════════════
+let editingProd=null, prodItems=[];
+function renderProducts(){ document.getElementById('products-grid').innerHTML = DB.products.length ? DB.products.map(p=>`
+  <div class="card">
+    <span class="badge badge-accent">${p.type}</span>
+    <div style="font-size:16px;font-weight:700;margin:10px 0 4px">${p.name}</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${(p.items||[]).length} materiales</div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--muted)">Costo real</span><span style="font-size:13px;color:var(--danger)">${fmt(p.totalCost)}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:12px;color:var(--muted)">Precio sugerido</span><span style="font-size:15px;font-weight:800;color:var(--success)">${fmt(p.price)}</span></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEditProd('${p.id}')">Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="delProd('${p.id}')">×</button>
+    </div>
+  </div>`).join('') : '<div class="card" style="text-align:center;padding:40px;color:var(--muted);grid-column:1/-1">No hay productos aún. ¡Crea el primero!</div>';
+}
+
+function openProductModal(){ editingProd=null; prodItems=[]; document.getElementById('prodModalTitle').textContent='Nuevo Producto'; document.getElementById('p-name').value=''; document.getElementById('p-hour').value=DB.settings.hour||15000; document.getElementById('p-time').value=1; document.getElementById('p-comp').value=1; document.getElementById('p-margin').value=40; populateProdMatSel(); renderProdItems(); updateProdPreview(); openModal('productModal'); }
+function openEditProd(id){ const p=DB.products.find(x=>x.id===id); if(!p)return; editingProd=id; prodItems=[...(p.items||[])]; document.getElementById('prodModalTitle').textContent='Editar Producto'; document.getElementById('p-name').value=p.name; document.getElementById('p-type').value=p.type; document.getElementById('p-hour').value=p.laborHour||15000; document.getElementById('p-time').value=p.laborTime||1; document.getElementById('p-comp').value=p.complexity||1; document.getElementById('p-margin').value=p.margin||40; populateProdMatSel(); renderProdItems(); updateProdPreview(); openModal('productModal'); }
+
+function populateProdMatSel(){ document.getElementById('p-mat-sel').innerHTML=DB.materials.map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); }
+function addProductItem(){ const mid=document.getElementById('p-mat-sel').value,qty=+document.getElementById('p-mat-qty').value||1; if(!mid)return; prodItems.push({id:uid(),materialId:mid,qty}); renderProdItems(); updateProdPreview(); }
+function removeProdItem(id){ prodItems=prodItems.filter(i=>i.id!==id); renderProdItems(); updateProdPreview(); }
+function renderProdItems(){ document.getElementById('p-items-list').innerHTML=prodItems.map(item=>{ const m=DB.materials.find(x=>x.id===item.materialId); return m?`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface2);border-radius:6px;margin-bottom:4px"><span style="font-size:12px">${m.name} × ${item.qty}</span><span style="font-size:12px;color:var(--accent2)">${fmt(uc(m)*item.qty)}</span><button onclick="removeProdItem('${item.id}')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:15px">×</button></div>`:'' }).join(''); }
+
+function calcProdCosts(){ const matCost=prodItems.reduce((a,item)=>{ const m=DB.materials.find(x=>x.id===item.materialId); return a+(m?uc(m)*item.qty:0); },0); const laborCost=(+document.getElementById('p-hour').value)*(+document.getElementById('p-time').value)*(+document.getElementById('p-comp').value); const indirect=(matCost+laborCost)*0.1; const total=matCost+laborCost+indirect; const margin=+document.getElementById('p-margin').value; const price=total*(1+margin/100); return {matCost,laborCost,indirect,totalCost:total,price,margin}; }
+
+function updateProdPreview(){ const c=calcProdCosts(); document.getElementById('prodPreview').innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${[['Materiales',c.matCost,'var(--text)'],['Mano de obra',c.laborCost,'var(--text)'],['Indirectos',c.indirect,'var(--text)'],['Costo total',c.totalCost,'var(--danger)'],['Precio sugerido',c.price,'var(--success)'],['Ganancia',c.price-c.totalCost,'var(--accent2)']].map(([l,v,col])=>`<div><div style="font-size:10px;color:var(--muted)">${l}</div><div style="font-size:14px;font-weight:700;color:${col}">${fmt(v)}</div></div>`).join('')}</div>`; const alerts=document.getElementById('prod-alerts'); alerts.innerHTML=''; if(c.margin<20) alerts.innerHTML+='<div class="alert alert-warning">⚠ Margen de ganancia bajo. Considera aumentarlo.</div>'; if(c.totalCost>c.price) alerts.innerHTML+='<div class="alert alert-danger">🚨 ¡Estás cobrando por debajo del costo real!</div>'; }
+
+function saveProduct(){ const n=document.getElementById('p-name').value.trim(); if(!n) return; const c=calcProdCosts(); const p={id:editingProd||uid(),name:n,type:document.getElementById('p-type').value,items:prodItems,laborHour:+document.getElementById('p-hour').value,laborTime:+document.getElementById('p-time').value,complexity:+document.getElementById('p-comp').value,margin:+document.getElementById('p-margin').value,...c,salesCount:0}; if(editingProd) DB.products=DB.products.map(x=>x.id===editingProd?p:x); else DB.products.push(p); persist('products'); closeModal('productModal'); renderProducts(); }
+function delProd(id){ if(confirm('¿Eliminar este producto?')){ DB.products=DB.products.filter(p=>p.id!==id); persist('products'); renderProducts(); } }
+
+// ══════════════════════════════════════════════
+//  BUDGETS
+// ══════════════════════════════════════════════
+let budgetItems=[];
+function renderBudgets(){ document.getElementById('budget-count').textContent=`${DB.budgets.length} presupuestos enviados`; document.getElementById('budget-tbody').innerHTML=DB.budgets.length?DB.budgets.map(b=>`<tr><td><strong>${b.clientName}</strong></td><td>${b.date}</td><td><strong style="color:var(--success)">${fmt(b.total)}</strong></td><td><span class="badge ${b.status==='convertido'?'badge-success':b.status==='rechazado'?'badge-danger':'badge-warning'}">${b.status}</span></td><td><div style="display:flex;gap:5px">${b.status==='pendiente'?`<button class="btn btn-ghost btn-sm" onclick="convertBudget('${b.id}')">→ Venta</button>`:''}<button class="btn btn-danger btn-sm" onclick="delBudget('${b.id}')">×</button></div></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">No hay presupuestos aún</td></tr>'; }
+
+function openBudgetModal(){ budgetItems=[]; document.getElementById('b-client').value=''; document.getElementById('b-date').value=today(); document.getElementById('b-notes').value=''; document.getElementById('b-delivery').value=3; document.getElementById('b-items-list').innerHTML=''; document.getElementById('b-total-box').style.display='none'; document.getElementById('b-prod-sel').innerHTML=DB.products.map(p=>`<option value="${p.id}">${p.name}</option>`).join(''); openModal('budgetModal'); }
+function addBudgetItem(){ const pid=document.getElementById('b-prod-sel').value,qty=+document.getElementById('b-prod-qty').value||1; if(!pid)return; budgetItems.push({id:uid(),productId:pid,qty}); renderBudgetItems(); }
+function renderBudgetItems(){ let total=0; document.getElementById('b-items-list').innerHTML=budgetItems.map(item=>{ const p=DB.products.find(x=>x.id===item.productId); if(!p)return''; total+=p.price*item.qty; return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface2);border-radius:6px;margin-bottom:4px"><span style="font-size:12px">${p.name} × ${item.qty}</span><span style="font-size:13px;font-weight:700;color:var(--success)">${fmt(p.price*item.qty)}</span><button onclick="removeBudgetItem('${item.id}')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:15px">×</button></div>`; }).join(''); if(total>0){ document.getElementById('b-total-box').style.display='block'; document.getElementById('b-total-val').textContent=fmt(total); } }
+function removeBudgetItem(id){ budgetItems=budgetItems.filter(i=>i.id!==id); renderBudgetItems(); }
+function saveBudget(){ const client=document.getElementById('b-client').value.trim(); if(!client)return; const total=budgetItems.reduce((a,item)=>{ const p=DB.products.find(x=>x.id===item.productId); return a+(p?p.price*item.qty:0); },0); const b={id:uid(),clientName:client,date:document.getElementById('b-date').value,items:budgetItems,total,notes:document.getElementById('b-notes').value,conditions:document.getElementById('b-cond').value,delivery:document.getElementById('b-delivery').value,status:'pendiente',createdAt:new Date().toISOString()}; DB.budgets.push(b); persist('budgets'); closeModal('budgetModal'); renderBudgets(); }
+function convertBudget(id){ const b=DB.budgets.find(x=>x.id===id); if(!b)return; DB.sales.push({id:uid(),clientName:b.clientName,date:today(),total:b.total,profit:b.total*0.3,paymentMethod:'transferencia',status:'pagado',notes:'Convertido desde presupuesto'}); DB.budgets=DB.budgets.map(x=>x.id===id?{...x,status:'convertido'}:x); persist('sales'); persist('budgets'); renderBudgets(); }
+function delBudget(id){ if(confirm('¿Eliminar este presupuesto?')){ DB.budgets=DB.budgets.filter(b=>b.id!==id); persist('budgets'); renderBudgets(); } }
+
+// ══════════════════════════════════════════════
+//  SALES
+// ══════════════════════════════════════════════
+function renderSales(){ const paid=DB.sales.filter(s=>s.status==='pagado'); const income=paid.reduce((a,s)=>a+s.total,0),profit=paid.reduce((a,s)=>a+(s.profit||0),0); document.getElementById('sales-count').textContent=`${DB.sales.length} ventas registradas`; document.getElementById('sales-stats').innerHTML=`<div class="card"><div class="card-title">Ingresos</div><div class="stat-val" style="color:var(--success)">${fmt(income)}</div></div><div class="card"><div class="card-title">Ganancia</div><div class="stat-val" style="color:var(--accent2)">${fmt(profit)}</div></div><div class="card"><div class="card-title">Total ventas</div><div class="stat-val">${DB.sales.length}</div></div>`; const q=(document.getElementById('salesSearch')||{}).value||''; const filtered=DB.sales.filter(s=>s.clientName?.toLowerCase().includes(q.toLowerCase())); document.getElementById('sales-tbody').innerHTML=filtered.length?filtered.map(s=>`<tr><td><strong>${s.clientName}</strong></td><td><strong style="color:var(--success)">${fmt(s.total)}</strong></td><td><span style="color:var(--accent2)">${fmt(s.profit)}</span></td><td><span class="badge ${s.status==='pagado'?'badge-success':s.status==='cancelado'?'badge-danger':'badge-warning'}">${s.status}</span></td><td><button class="btn btn-danger btn-sm" onclick="delSale('${s.id}')">×</button></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">No hay ventas registradas</td></tr>'; }
+function openSaleModal(){ document.getElementById('sl-client').value=''; document.getElementById('sl-date').value=today(); document.getElementById('sl-total').value=''; document.getElementById('sl-profit').value=''; document.getElementById('sl-notes').value=''; openModal('saleModal'); }
+function updateSaleProfit(){ const t=+document.getElementById('sl-total').value; if(t) document.getElementById('sl-profit').value=Math.round(t*0.3); }
+function saveSale(){ const client=document.getElementById('sl-client').value.trim(); if(!client)return; const s={id:uid(),clientName:client,date:document.getElementById('sl-date').value,total:+document.getElementById('sl-total').value||0,profit:+document.getElementById('sl-profit').value||0,paymentMethod:document.getElementById('sl-method').value,status:document.getElementById('sl-status').value,notes:document.getElementById('sl-notes').value}; DB.sales.push(s); persist('sales'); closeModal('saleModal'); renderSales(); }
+function delSale(id){ if(confirm('¿Eliminar esta venta?')){ DB.sales=DB.sales.filter(s=>s.id!==id); persist('sales'); renderSales(); } }
+
+// ══════════════════════════════════════════════
+//  CLIENTS
+// ══════════════════════════════════════════════
+let editingClient=null;
+function renderClients(){ document.getElementById('clients-count').textContent=`${DB.clients.length} clientes registrados`; document.getElementById('clients-grid').innerHTML=DB.clients.length?DB.clients.map(c=>{ const cs=DB.sales.filter(s=>s.clientName===c.name); const total=cs.reduce((a,s)=>a+s.total,0); return `<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><div class="avatar">${c.name.charAt(0).toUpperCase()}</div><div><div style="font-weight:700;font-size:15px">${c.name}</div>${c.phone?`<div style="font-size:11px;color:var(--muted)">📞 ${c.phone}</div>`:''}</div></div>${c.instagram?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px">📸 @${c.instagram}</div>`:''} ${c.birthday?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px">🎂 ${c.birthday}</div>`:''}<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--muted)">${cs.length} pedidos</span><span style="font-size:13px;font-weight:700;color:var(--success)">${fmt(total)}</span></div><div style="display:flex;gap:6px;margin-top:10px"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEditClient('${c.id}')">Editar</button><button class="btn btn-danger btn-sm" onclick="delClient('${c.id}')">×</button></div></div>`}).join(''):'<div class="card" style="text-align:center;padding:40px;color:var(--muted);grid-column:1/-1">No hay clientes registrados</div>'; }
+function openClientModal(){ editingClient=null; document.getElementById('clientModalTitle').textContent='Nuevo Cliente'; ['cl-name','cl-phone','cl-ig','cl-notes'].forEach(id=>document.getElementById(id).value=''); document.getElementById('cl-bday').value=''; openModal('clientModal'); }
+function openEditClient(id){ const c=DB.clients.find(x=>x.id===id); if(!c)return; editingClient=id; document.getElementById('clientModalTitle').textContent='Editar Cliente'; document.getElementById('cl-name').value=c.name; document.getElementById('cl-phone').value=c.phone||''; document.getElementById('cl-ig').value=c.instagram||''; document.getElementById('cl-bday').value=c.birthday||''; document.getElementById('cl-notes').value=c.notes||''; openModal('clientModal'); }
+function saveClient(){ const n=document.getElementById('cl-name').value.trim(); if(!n)return; const c={id:editingClient||uid(),name:n,phone:document.getElementById('cl-phone').value,instagram:document.getElementById('cl-ig').value,birthday:document.getElementById('cl-bday').value,notes:document.getElementById('cl-notes').value}; if(editingClient) DB.clients=DB.clients.map(x=>x.id===editingClient?c:x); else DB.clients.push(c); persist('clients'); closeModal('clientModal'); renderClients(); }
+function delClient(id){ if(confirm('¿Eliminar este cliente?')){ DB.clients=DB.clients.filter(c=>c.id!==id); persist('clients'); renderClients(); } }
+
+// ══════════════════════════════════════════════
+//  HELIUM
+// ══════════════════════════════════════════════
+function calcHelium(){ const tank=+document.getElementById('h-tank').value||45000,count=+document.getElementById('h-count').value||80,need=+document.getElementById('h-need').value||20; const perBalloon=tank/count; const total=perBalloon*need; const suggested=perBalloon*2.5; document.getElementById('helium-result').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div style="font-size:11px;color:var(--muted)">Costo por globo</div><div style="font-size:22px;font-weight:800;color:var(--accent2)">${fmt(perBalloon)}</div></div><div><div style="font-size:11px;color:var(--muted)">Costo total (${need} globos)</div><div style="font-size:22px;font-weight:800;color:var(--success)">${fmt(total)}</div></div></div><div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(108,92,231,.2)"><div style="font-size:11px;color:var(--muted)">Precio sugerido de cobro por globo</div><div style="font-size:18px;font-weight:700;color:var(--warning)">${fmt(suggested)}</div></div>`; document.getElementById('helium-tip').innerHTML=`Con este tanque puedes inflar <strong>${count} globos</strong>. Si cobras <strong>${fmt(suggested)}</strong> por globo de helio, recuperas el costo del gas con un margen del 150%. Recuerda siempre sumar el costo del helio al precio final de tu producto.`; }
+
+// ══════════════════════════════════════════════
+//  TOOLS (depreciación)
+// ══════════════════════════════════════════════
+function addTool(){ const n=document.getElementById('t-name').value.trim(),v=+document.getElementById('t-val').value,life=+document.getElementById('t-life').value||3,mo=+document.getElementById('t-month').value||10; if(!n||!v)return; const monthly=v/(life*12),perJob=monthly/mo; DB.tools.push({id:uid(),name:n,value:v,lifeYears:life,usagePerMonth:mo,monthly,perJob}); persist('tools'); document.getElementById('t-name').value=''; document.getElementById('t-val').value=''; renderTools(); }
+function renderTools(){ const list=document.getElementById('tools-list'); list.innerHTML=DB.tools.map(t=>`<div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:14px">${t.name}</span><button onclick="delTool('${t.id}')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:18px">×</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div style="font-size:10px;color:var(--muted)">Depr. mensual</div><div style="font-weight:700;color:var(--warning)">${fmt(t.monthly)}</div></div><div><div style="font-size:10px;color:var(--muted)">Costo por trabajo</div><div style="font-weight:700;color:var(--accent2)">${fmt(t.perJob)}</div></div></div></div>`).join(''); const total=DB.tools.reduce((a,t)=>a+t.perJob,0); if(DB.tools.length){ document.getElementById('tools-total-card').style.display='block'; document.getElementById('tools-total').textContent=fmt(total); } }
+function delTool(id){ DB.tools=DB.tools.filter(t=>t.id!==id); persist('tools'); renderTools(); }
+
+// ══════════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════════
+function loadSettings(){
+  const s=DB.settings;
+  document.getElementById('s-name').value=s.name||'';
+  document.getElementById('s-ig').value=s.ig||'';
+  document.getElementById('s-wa').value=s.wa||'';
+  document.getElementById('s-email').value=s.email||'';
+  document.getElementById('s-addr').value=s.addr||'';
+  document.getElementById('s-hour').value=s.hour||15000;
+  document.getElementById('s-ads').value=s.ads||0;
+  document.getElementById('s-orders').value=s.orders||10;
+  const sel=document.getElementById('s-currency');
+  if(sel) sel.value=s.currency||'CLP';
+  updateAdsResult();
+  previewCurrency();
+}
+
+function previewCurrency(){
+  const sel=document.getElementById('s-currency');
+  if(!sel)return;
+  const code=sel.value;
+  const cur=CURRENCIES.find(c=>c.code===code);
+  const preview=document.getElementById('s-currency-preview');
+  if(!cur||!preview)return;
+  preview.style.display='block';
+  const sample=cur.decimals>0?1234.56:150000;
+  try {
+    const formatted=new Intl.NumberFormat(cur.locale,{style:'currency',currency:cur.code,minimumFractionDigits:cur.decimals,maximumFractionDigits:cur.decimals}).format(sample);
+    preview.innerHTML=`Vista previa: <strong style="color:var(--accent2)">${formatted}</strong> — ${cur.label}`;
+  } catch(e){
+    preview.innerHTML=`Vista previa: <strong style="color:var(--accent2)">${cur.symbol} ${sample.toLocaleString()}</strong> — ${cur.label}`;
+  }
+}
+
+function updateAdsResult(){
+  const ads=+document.getElementById('s-ads').value,orders=+document.getElementById('s-orders').value;
+  const r=document.getElementById('s-ads-result');
+  if(ads>0&&orders>0) r.innerHTML=`<div class="hbox"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Publicidad distribuida por pedido</div><div style="font-size:20px;font-weight:800;color:var(--warning)">${fmt(ads/orders)}</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Este costo debe sumarse a cada trabajo</div></div>`;
+  else r.innerHTML='';
+}
+document.getElementById('s-ads').addEventListener('input',updateAdsResult);
+document.getElementById('s-orders').addEventListener('input',updateAdsResult);
+
+function saveSettings(){
+  const currency=document.getElementById('s-currency')?.value||'CLP';
+  DB.settings={
+    name:document.getElementById('s-name').value,
+    ig:document.getElementById('s-ig').value,
+    wa:document.getElementById('s-wa').value,
+    email:document.getElementById('s-email').value,
+    addr:document.getElementById('s-addr').value,
+    hour:+document.getElementById('s-hour').value||15000,
+    ads:+document.getElementById('s-ads').value||0,
+    orders:+document.getElementById('s-orders').value||10,
+    currency
+  };
+  persist('settings');
+  document.getElementById('sideBusinessName').textContent=DB.settings.name||'Mi Negocio';
+  document.getElementById('sideInsta').textContent=DB.settings.ig?'@'+DB.settings.ig:'';
+  // Mostrar moneda activa en sidebar
+  const cur=getCurrency();
+  const foot=document.getElementById('sideInsta');
+  if(foot&&DB.settings.ig) foot.textContent='@'+DB.settings.ig+' · '+cur.code;
+  alert('✅ Configuración guardada. La moneda se aplicará en toda la app.');
+}
+
+// ══════════════════════════════════════════════
+//  PWA INSTALL
+// ══════════════════════════════════════════════
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; setTimeout(()=>document.getElementById('installBanner').classList.add('show'),3000); });
+function installApp(){ if(!deferredPrompt)return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('installBanner').classList.remove('show'); }); }
+
+// ══════════════════════════════════════════════
+//  SERVICE WORKER (offline support)
+// ══════════════════════════════════════════════
+if('serviceWorker' in navigator){
+  const swCode=`
+    const CACHE='globify-v1';
+    const ASSETS=['/'];
+    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
+    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/')))));
+  `;
+  const blob=new Blob([swCode],{type:'application/javascript'});
+  const swUrl=URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+function initApp(){
+  renderDashboard();
+  document.getElementById('sideBusinessName').textContent=DB.settings.name||'Mi Negocio';
+  document.getElementById('sideInsta').textContent=DB.settings.ig?'@'+DB.settings.ig:'';
+}
+</script>
+</body>
+</html>
