@@ -459,6 +459,25 @@ nav{padding:12px 0;flex:1}
             <div id="s-ads-result"></div>
           </div>
           <button class="btn btn-primary btn-full" onclick="saveSettings()">Guardar configuración</button>
+
+          <!-- RESPALDO DE DATOS -->
+          <div class="card" style="margin-top:14px;border:1px solid rgba(0,184,148,.25)">
+            <div class="card-title" style="color:var(--success)">🔐 Respaldo de datos</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+              Exporta todos tus datos (materiales, productos, ventas, clientes) en un archivo seguro. 
+              Guárdalo en Google Drive o en tu celular para no perder nada.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-ghost" style="flex:1;border-color:var(--success);color:var(--success)" onclick="exportData()">
+                ⬇ Exportar mis datos
+              </button>
+              <label class="btn btn-ghost" style="flex:1;cursor:pointer;text-align:center;border-color:var(--accent2);color:var(--accent2)">
+                ⬆ Importar respaldo
+                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"/>
+              </label>
+            </div>
+            <div id="backup-msg" style="margin-top:10px;font-size:12px;min-height:16px"></div>
+          </div>
         </div>
       </div>
 
@@ -884,27 +903,31 @@ function renderDashboard() {
 // ══════════════════════════════════════════════
 let editingMat = null;
 function renderMaterials() {
-  var matCount = document.getElementById('mat-count');
-  var matTbody = document.getElementById('mat-tbody');
-  if (!matCount || !matTbody) return;
-  matCount.textContent = DB.materials.length + ' materiales registrados';
-  const q = (document.getElementById('matSearch')||{}).value||'';
-  const filtered = DB.materials.filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
-  matTbody.innerHTML = filtered.map(m=>`
-    <tr>
-      <td><strong>${m.name}</strong></td>
-      <td><span class="badge badge-accent">${m.category}</span></td>
-      <td>${fmt(m.packagePrice)}</td>
-      <td>${m.packageQty} u.</td>
-      <td><strong style="color:var(--accent2)">${fmt(uc(m))}</strong></td>
-      <td>
-        <div style="display:flex;gap:5px">
-          <button class="btn btn-ghost btn-sm" onclick="openEditMat('${m.id}')">Editar</button>
-          <button class="btn btn-ghost btn-sm" onclick="dupMat('${m.id}')">Dup.</button>
-          <button class="btn btn-danger btn-sm" onclick="delMat('${m.id}')">×</button>
-        </div>
-      </td>
-    </tr>`).join('');
+  // Esperar a que el DOM esté visible
+  setTimeout(function() {
+    var matCount = document.getElementById('mat-count');
+    var matTbody = document.getElementById('mat-tbody');
+    if (!matCount || !matTbody) { setTimeout(renderMaterials, 100); return; }
+    matCount.textContent = DB.materials.length + ' materiales registrados';
+    var q = (document.getElementById('matSearch') || {}).value || '';
+    var filtered = DB.materials.filter(function(m){ return m.name.toLowerCase().includes(q.toLowerCase()); });
+    if (filtered.length === 0) {
+      matTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted)">No hay materiales. Agrega el primero.</td></tr>';
+      return;
+    }
+    matTbody.innerHTML = filtered.map(function(m){ return '<tr>' +
+      '<td><strong>' + m.name + '</strong></td>' +
+      '<td><span class="badge badge-accent">' + m.category + '</span></td>' +
+      '<td>' + fmt(m.packagePrice) + '</td>' +
+      '<td>' + m.packageQty + ' u.</td>' +
+      '<td><strong style="color:var(--accent2)">' + fmt(uc(m)) + '</strong></td>' +
+      '<td><div style="display:flex;gap:5px">' +
+        '<button class="btn btn-ghost btn-sm" onclick="openEditMat('' + m.id + '')">Editar</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="dupMat('' + m.id + '')">Dup.</button>' +
+        '<button class="btn btn-danger btn-sm" onclick="delMat('' + m.id + '')">×</button>' +
+      '</div></td></tr>';
+    }).join('');
+  }, 50);
 }
 
 function openMatModal(){ editingMat=null; document.getElementById('matModalTitle').textContent='Nuevo Material'; ['m-name','m-prov','m-notes'].forEach(id=>document.getElementById(id).value=''); document.getElementById('m-cat').value='Látex'; document.getElementById('m-price').value=''; document.getElementById('m-qty').value=''; document.getElementById('m-waste').value=5; document.getElementById('m-loss').value=2; document.getElementById('matPreview').style.display='none'; openModal('matModal'); }
@@ -1058,6 +1081,70 @@ function saveSettings(){
   const foot=document.getElementById('sideInsta');
   if(foot&&DB.settings.ig) foot.textContent='@'+DB.settings.ig+' · '+cur.code;
   alert('✅ Configuración guardada. La moneda se aplicará en toda la app.');
+}
+
+// ══════════════════════════════════════════════
+//  EXPORT / IMPORT DATA
+// ══════════════════════════════════════════════
+function exportData() {
+  try {
+    var backup = {
+      version: '1.0',
+      date: new Date().toISOString(),
+      materials: DB.materials,
+      products:  DB.products,
+      budgets:   DB.budgets,
+      sales:     DB.sales,
+      clients:   DB.clients,
+      tools:     DB.tools,
+      settings:  DB.settings
+    };
+    var json = JSON.stringify(backup, null, 2);
+    var blob = new Blob([json], {type: 'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var fecha = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = 'globify-respaldo-' + fecha + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    var msg = document.getElementById('backup-msg');
+    if (msg) { msg.style.color = 'var(--success)'; msg.textContent = '✅ Respaldo exportado correctamente. ¡Guárdalo en un lugar seguro!'; }
+  } catch(e) {
+    var msg = document.getElementById('backup-msg');
+    if (msg) { msg.style.color = 'var(--danger)'; msg.textContent = '❌ Error al exportar. Intenta de nuevo.'; }
+  }
+}
+
+function importData(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var backup = JSON.parse(e.target.result);
+      if (!backup.version || !backup.materials) {
+        throw new Error('Archivo inválido');
+      }
+      if (!confirm('⚠️ Esto reemplazará TODOS tus datos actuales con el respaldo. ¿Continuar?')) return;
+      if (backup.materials) { DB.materials = backup.materials; persist('materials'); }
+      if (backup.products)  { DB.products  = backup.products;  persist('products'); }
+      if (backup.budgets)   { DB.budgets   = backup.budgets;   persist('budgets'); }
+      if (backup.sales)     { DB.sales     = backup.sales;     persist('sales'); }
+      if (backup.clients)   { DB.clients   = backup.clients;   persist('clients'); }
+      if (backup.tools)     { DB.tools     = backup.tools;     persist('tools'); }
+      if (backup.settings)  { DB.settings  = backup.settings;  persist('settings'); }
+      var msg = document.getElementById('backup-msg');
+      if (msg) { msg.style.color = 'var(--success)'; msg.textContent = '✅ Datos restaurados correctamente. ¡Todo está de vuelta!'; }
+      setTimeout(function() { navigateTo('dashboard'); }, 1500);
+    } catch(err) {
+      var msg = document.getElementById('backup-msg');
+      if (msg) { msg.style.color = 'var(--danger)'; msg.textContent = '❌ Archivo inválido. Asegúrate de subir un respaldo de Globify.'; }
+    }
+  };
+  reader.readAsText(file);
 }
 
 // ══════════════════════════════════════════════
