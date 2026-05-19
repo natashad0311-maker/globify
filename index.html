@@ -104,8 +104,8 @@ nav{padding:12px 0;flex:1}
 .overlay.show{display:block}
 
 /* ── PAGE ── */
-.page{display:none;animation:fadeIn .2s ease}
-.page.active{display:block}
+.page{display:none !important;animation:fadeIn .2s ease}
+.page.active{display:block !important}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:3px}
 .page-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
@@ -884,10 +884,13 @@ function renderDashboard() {
 // ══════════════════════════════════════════════
 let editingMat = null;
 function renderMaterials() {
-  document.getElementById('mat-count').textContent = `${DB.materials.length} materiales registrados`;
+  var matCount = document.getElementById('mat-count');
+  var matTbody = document.getElementById('mat-tbody');
+  if (!matCount || !matTbody) return;
+  matCount.textContent = DB.materials.length + ' materiales registrados';
   const q = (document.getElementById('matSearch')||{}).value||'';
   const filtered = DB.materials.filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
-  document.getElementById('mat-tbody').innerHTML = filtered.map(m=>`
+  matTbody.innerHTML = filtered.map(m=>`
     <tr>
       <td><strong>${m.name}</strong></td>
       <td><span class="badge badge-accent">${m.category}</span></td>
